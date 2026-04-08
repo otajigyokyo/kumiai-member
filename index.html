@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>組合員連絡先登録 | 大田市場花き事業協同組合</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-bg"></div>
+  <main class="container">
+    <header class="header">
+      <div class="header-icon">🌸</div>
+      <h1>大田市場花き事業協同組合</h1>
+      <p class="subtitle">組合員 連絡先登録フォーム</p>
+    </header>
+    <div class="notice">
+      <p>組合からの通知・連絡を迅速にお届けするため、<br class="sp-only">連絡先のご登録をお願いいたします。</p>
+    </div>
+    <div id="form-section">
+      <div class="form-card">
+        <div class="field">
+          <label for="baisan">買参番号 <span class="req">必須</span></label>
+          <input type="text" id="baisan" inputmode="numeric" pattern="[0-9]*" placeholder="例: 1234" maxlength="10" autocomplete="off">
+          <span class="error" id="err-baisan"></span>
+        </div>
+        <div class="field">
+          <label for="shopname">店名 <span class="req">必須</span></label>
+          <input type="text" id="shopname" placeholder="例: 銀座東京フラワー" autocomplete="organization">
+          <span class="error" id="err-shopname"></span>
+        </div>
+        <div class="field">
+          <label for="name">代表者氏名 <span class="req">必須</span></label>
+          <input type="text" id="name" placeholder="例: 山田 太郎" autocomplete="name">
+          <span class="error" id="err-name"></span>
+        </div>
+        <div class="field">
+          <label for="tel">電話番号 <span class="req">必須</span></label>
+          <input type="tel" id="tel" placeholder="例: 03-1234-5678" autocomplete="tel">
+          <span class="error" id="err-tel"></span>
+        </div>
+        <div class="field">
+          <label for="email">メールアドレス <span class="req">必須</span></label>
+          <input type="email" id="email" placeholder="例: info@example.com" autocomplete="email">
+          <span class="error" id="err-email"></span>
+        </div>
+        <button id="submit-btn" onclick="submitForm()">
+          <span class="btn-text">登録する</span>
+          <span class="btn-loading" style="display:none;">送信中...</span>
+        </button>
+      </div>
+    </div>
+    <div id="success-section" class="success-section" style="display:none;">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <h2>登録が完了しました</h2>
+        <p>ご登録ありがとうございます。<br>組合からの連絡は登録いただいたメールアドレスへお送りいたします。</p>
+        <button class="btn-another" onclick="resetForm()">別の登録を行う</button>
+      </div>
+    </div>
+    <footer class="footer">
+      <p>&copy; 大田市場花き事業協同組合</p>
+    </footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

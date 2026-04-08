@@ -1,0 +1,290 @@
+以下のファイルをすべて作成してください。
+
+■ index.html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>組合員連絡先登録 | 大田市場花き事業協同組合</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-bg"></div>
+  <main class="container">
+    <header class="header">
+      <div class="header-icon">🌸</div>
+      <h1>大田市場花き事業協同組合</h1>
+      <p class="subtitle">組合員 連絡先登録フォーム</p>
+    </header>
+    <div class="notice">
+      <p>組合からの通知・連絡を迅速にお届けするため、<br class="sp-only">連絡先のご登録をお願いいたします。</p>
+    </div>
+    <div id="form-section">
+      <div class="form-card">
+        <div class="field">
+          <label for="baisan">買参番号 <span class="req">必須</span></label>
+          <input type="text" id="baisan" inputmode="numeric" pattern="[0-9]*" placeholder="例: 1234" maxlength="10" autocomplete="off">
+          <span class="error" id="err-baisan"></span>
+        </div>
+        <div class="field">
+          <label for="shopname">店名 <span class="req">必須</span></label>
+          <input type="text" id="shopname" placeholder="例: 銀座東京フラワー" autocomplete="organization">
+          <span class="error" id="err-shopname"></span>
+        </div>
+        <div class="field">
+          <label for="name">代表者氏名 <span class="req">必須</span></label>
+          <input type="text" id="name" placeholder="例: 山田 太郎" autocomplete="name">
+          <span class="error" id="err-name"></span>
+        </div>
+        <div class="field">
+          <label for="tel">電話番号 <span class="req">必須</span></label>
+          <input type="tel" id="tel" placeholder="例: 03-1234-5678" autocomplete="tel">
+          <span class="error" id="err-tel"></span>
+        </div>
+        <div class="field">
+          <label for="email">メールアドレス <span class="req">必須</span></label>
+          <input type="email" id="email" placeholder="例: info@example.com" autocomplete="email">
+          <span class="error" id="err-email"></span>
+        </div>
+        <button id="submit-btn" onclick="submitForm()">
+          <span class="btn-text">登録する</span>
+          <span class="btn-loading" style="display:none;">送信中...</span>
+        </button>
+      </div>
+    </div>
+    <div id="success-section" class="success-section" style="display:none;">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <h2>登録が完了しました</h2>
+        <p>ご登録ありがとうございます。<br>組合からの連絡は登録いただいたメールアドレスへお送りいたします。</p>
+        <button class="btn-another" onclick="resetForm()">別の登録を行う</button>
+      </div>
+    </div>
+    <footer class="footer">
+      <p>&copy; 大田市場花き事業協同組合</p>
+    </footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
+
+■ style.css
+:root {
+  --green-deep: #2d5a3d;
+  --green-mid: #3a7a52;
+  --green-light: #e8f5ec;
+  --green-pale: #f4faf6;
+  --accent: #c8a45c;
+  --text: #2c2c2c;
+  --text-sub: #6b7b6f;
+  --white: #ffffff;
+  --error: #d44;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(45, 90, 61, 0.10);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--text);
+  background: var(--green-pale);
+  min-height: 100dvh;
+  line-height: 1.7;
+}
+.page-bg {
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(58,122,82,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(200,164,92,0.06) 0%, transparent 50%),
+    var(--green-pale);
+}
+.container { max-width: 520px; margin: 0 auto; padding: 32px 20px 48px; }
+.header { text-align: center; margin-bottom: 24px; }
+.header-icon { font-size: 40px; margin-bottom: 8px; }
+.header h1 {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--green-deep); letter-spacing: 0.04em;
+}
+.subtitle { font-size: 0.95rem; color: var(--text-sub); margin-top: 4px; }
+.notice {
+  background: var(--white); border-left: 4px solid var(--green-mid);
+  border-radius: 8px; padding: 14px 18px; margin-bottom: 28px;
+  font-size: 0.88rem; color: var(--text-sub); box-shadow: var(--shadow);
+}
+.form-card {
+  background: var(--white); border-radius: var(--radius);
+  padding: 28px 24px 32px; box-shadow: var(--shadow);
+}
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 0.88rem; font-weight: 500; margin-bottom: 6px; color: var(--green-deep); }
+.req { font-size: 0.7rem; background: var(--error); color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+.field input {
+  width: 100%; padding: 12px 14px; border: 1.5px solid #d0ddd4;
+  border-radius: 8px; font-size: 1rem; font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s; background: var(--green-pale);
+}
+.field input:focus { outline: none; border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(58,122,82,0.12); }
+.field input.invalid { border-color: var(--error); }
+.error { display: block; font-size: 0.78rem; color: var(--error); min-height: 1.2em; margin-top: 4px; }
+#submit-btn {
+  display: block; width: 100%; padding: 14px; margin-top: 8px;
+  background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+  color: var(--white); font-family: inherit; font-size: 1.05rem; font-weight: 700;
+  border: none; border-radius: 8px; cursor: pointer; letter-spacing: 0.06em;
+  transition: opacity 0.2s, transform 0.1s;
+}
+#submit-btn:hover { opacity: 0.9; }
+#submit-btn:active { transform: scale(0.98); }
+#submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.success-section { animation: fadeIn 0.4s ease; }
+.success-card {
+  background: var(--white); border-radius: var(--radius);
+  padding: 40px 24px; text-align: center; box-shadow: var(--shadow);
+}
+.success-icon { font-size: 48px; margin-bottom: 12px; }
+.success-card h2 { color: var(--green-deep); font-size: 1.2rem; margin-bottom: 12px; }
+.success-card p { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 24px; }
+.btn-another {
+  padding: 10px 28px; background: transparent; border: 1.5px solid var(--green-mid);
+  color: var(--green-mid); border-radius: 8px; font-family: inherit; font-size: 0.9rem;
+  font-weight: 500; cursor: pointer; transition: background 0.2s;
+}
+.btn-another:hover { background: var(--green-light); }
+.footer { text-align: center; margin-top: 40px; font-size: 0.78rem; color: var(--text-sub); }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.sp-only { display: none; }
+@media (max-width: 600px) {
+  .container { padding: 24px 16px 40px; }
+  .form-card { padding: 24px 18px 28px; }
+  .sp-only { display: inline; }
+}
+
+■ script.js
+const GAS_URL = 'https://script.google.com/macros/s/XXXXXXXXXXXXXXX/exec';
+
+function validate() {
+  let ok = true;
+  const fields = [
+    { id: 'baisan', errId: 'err-baisan', msg: '買参番号を入力してください', regex: /^[0-9]+$/, regexMsg: '半角数字で入力してください' },
+    { id: 'shopname', errId: 'err-shopname', msg: '店名を入力してください' },
+    { id: 'name', errId: 'err-name', msg: '代表者氏名を入力してください' },
+    { id: 'tel', errId: 'err-tel', msg: '電話番号を入力してください' },
+    { id: 'email', errId: 'err-email', msg: 'メールアドレスを入力してください', regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, regexMsg: '正しい形式で入力してください' },
+  ];
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const err = document.getElementById(f.errId);
+    const val = el.value.trim();
+    el.classList.remove('invalid'); err.textContent = '';
+    if (!val) { err.textContent = f.msg; el.classList.add('invalid'); ok = false; }
+    else if (f.regex && !f.regex.test(val)) { err.textContent = f.regexMsg; el.classList.add('invalid'); ok = false; }
+  });
+  return ok;
+}
+
+async function submitForm() {
+  if (!validate()) return;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.querySelector('.btn-text').style.display = 'none';
+  btn.querySelector('.btn-loading').style.display = 'inline';
+  const data = {
+    baisan: document.getElementById('baisan').value.trim(),
+    shopname: document.getElementById('shopname').value.trim(),
+    name: document.getElementById('name').value.trim(),
+    tel: document.getElementById('tel').value.trim(),
+    email: document.getElementById('email').value.trim(),
+  };
+  try {
+    const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) });
+    const json = await res.json();
+    if (json.status === 'ok') {
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('success-section').style.display = 'block';
+    } else { alert('エラー: ' + (json.message || '不明')); }
+  } catch (e) { alert('通信エラーが発生しました。'); console.error(e); }
+  finally {
+    btn.disabled = false;
+    btn.querySelector('.btn-text').style.display = 'inline';
+    btn.querySelector('.btn-loading').style.display = 'none';
+  }
+}
+
+function resetForm() {
+  ['baisan','shopname','name','tel','email'].forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).classList.remove('invalid'); });
+  document.querySelectorAll('.error').forEach(el => el.textContent = '');
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('success-section').style.display = 'none';
+}
+
+■ gas/Code.gs
+const SHEET_NAME = '組合員連絡先';
+const HEADERS = ['タイムスタンプ', '買参番号', '店名', '代表者氏名', '電話番号', 'メールアドレス'];
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const { baisan, shopname, name, tel, email } = data;
+    if (!baisan || !shopname || !name || !tel || !email) {
+      return jsonResponse({ status: 'error', message: '必須項目が不足しています' });
+    }
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+      sheet.appendRow(HEADERS);
+      sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
+    }
+    const now = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd HH:mm:ss');
+    const rowData = [now, baisan, shopname, name, tel, email];
+    const lastRow = sheet.getLastRow();
+    let updated = false;
+    if (lastRow > 1) {
+      const baisanCol = sheet.getRange(2, 2, lastRow - 1, 1).getValues();
+      for (let i = 0; i < baisanCol.length; i++) {
+        if (String(baisanCol[i][0]) === String(baisan)) {
+          sheet.getRange(i + 2, 1, 1, HEADERS.length).setValues([rowData]);
+          updated = true; break;
+        }
+      }
+    }
+    if (!updated) sheet.appendRow(rowData);
+    return jsonResponse({ status: 'ok', action: updated ? 'updated' : 'created' });
+  } catch (err) { return jsonResponse({ status: 'error', message: err.message }); }
+}
+
+function jsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet() {
+  return jsonResponse({ status: 'ok', message: '組合員連絡先登録API稼働中' });
+}
+
+■ gas/appsscript.json
+{
+  "timeZone": "Asia/Tokyo",
+  "dependencies": {},
+  "webapp": { "access": "ANYONE_ANONYMOUS", "executeAs": "USER_DEPLOYING" },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8"
+}
+
+■ .gitignore
+gas/.clasp.json
+.DS_Store
+node_modules/
+
+■ README.md にセットアップ手順を記載
+
+全ファイル作成後、以下を実行：
+1. git init && git add -A && git commit -m "初回: 組合員連絡先登録フォーム"
+2. gh repo create kumiai-member --public --source=. --push
+3. cd gas && clasp create --type webapp --title "組合員連絡先登録" --rootDir .
+4. clasp push
+5. デプロイURLが取得できたら script.js の GAS_URL を差し替え、commit & push
+
+確認なしで進めてください。
