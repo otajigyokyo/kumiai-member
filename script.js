@@ -1,4 +1,4 @@
-const GAS_URL = 'https://script.google.com/macros/s/XXXXXXXXXXXXXXX/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwu7GrebY_mb4DwVGfdT6E-9ugh6uQRybu7MjuPLpaVRs2tY0dro6adpaTAhZqhycIF3w/exec';
 
 function validate() {
   let ok = true;
