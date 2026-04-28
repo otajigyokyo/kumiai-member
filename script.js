@@ -1,4 +1,11 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwu7GrebY_mb4DwVGfdT6E-9ugh6uQRybu7MjuPLpaVRs2tY0dro6adpaTAhZqhycIF3w/exec';
+const USE_MOCK = false;
+
+function mockSubmit() {
+  return new Promise(resolve => {
+    setTimeout(() => resolve({ status: 'ok', action: 'created' }), 500);
+  });
+}
 
 function validate() {
   let ok = true;
@@ -34,8 +41,13 @@ async function submitForm() {
     email: document.getElementById('email').value.trim(),
   };
   try {
-    const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) });
-    const json = await res.json();
+    let json;
+    if (USE_MOCK) {
+      json = await mockSubmit();
+    } else {
+      const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) });
+      json = await res.json();
+    }
     if (json.status === 'ok') {
       document.getElementById('form-section').style.display = 'none';
       document.getElementById('success-section').style.display = 'block';
