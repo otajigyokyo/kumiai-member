@@ -1,3 +1,4 @@
+const SPREADSHEET_ID = '14u979d9GilWEBkWx8vik2nzGQiNedK5tALuZkkAyEOQ';
 const SHEET_NAME = '組合員連絡先';
 const HEADERS = ['タイムスタンプ', '買参番号', '店名', '代表者氏名', '電話番号', 'メールアドレス'];
 
@@ -15,7 +16,7 @@ function doPost(e) {
       return jsonResponse({ status: 'error', message: '混雑しています。少し時間をおいて再度お試しください' });
     }
     try {
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
       let sheet = ss.getSheetByName(SHEET_NAME);
       if (!sheet) {
         sheet = ss.insertSheet(SHEET_NAME);

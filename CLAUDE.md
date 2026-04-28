@@ -5,10 +5,11 @@
 ## プロジェクト概要
 
 大田市場花き事業協同組合の **組合員連絡先登録フォーム**。
-組合員が買参番号・店名・代表者氏名・電話番号・メールアドレスを登録すると、Google スプレッドシート「組合員連絡先」に **買参番号をキーとした Upsert** で書き込まれる。
+組合員が買参番号・店名・代表者氏名・電話番号・メールアドレスを登録すると、指定された Google スプレッドシートの「組合員連絡先」タブに **買参番号をキーとした Upsert** で書き込まれる。
 
 - 公開URL: `https://member.jigyokyo.com/`(GitHub Pages + 独自ドメイン)
-- バックエンド: Google Apps Script Web App + Google スプレッドシート
+- バックエンド: Google Apps Script **スタンドアロン** Web App
+- 書き込み先: スプレッドシートID指定で `openById()` で開く外部スプレッドシート(後述)
 - 履歴は残さず、同じ買参番号の登録は **上書き**(タイムスタンプも上書き)
 
 ## ファイル構成
@@ -32,14 +33,41 @@
    │  fetch POST  Content-Type: text/plain  body=JSON文字列
    │  ※ text/plain で送ることで CORS preflight (OPTIONS) を回避
    ▼
-GAS Web App (script.google.com/macros/s/.../exec)
+GAS スタンドアロン Web App (script.google.com/macros/s/.../exec)
    │  doPost(e) → JSON.parse(e.postData.contents)
-   │  必須項目チェック → 「組合員連絡先」シートを取得/新規作成
+   │  必須項目チェック → LockService.waitLock(10000)
+   │  SpreadsheetApp.openById(SPREADSHEET_ID) で対象シートを開く
+   │  「組合員連絡先」タブを取得/新規作成
    │  買参番号で既存行を線形探索 → 一致すれば setValues で上書き、なければ appendRow
    ▼
-Google スプレッドシート「組合員連絡先」
-   列: タイムスタンプ / 買参番号 / 店名 / 代表者氏名 / 電話番号 / メールアドレス
+Google スプレッドシート (ID: 14u979d9...AyEOQ)
+   ├─ 「組合員連絡先」タブ        ← このGASがUpsertで操作
+   │   列: タイムスタンプ / 買参番号 / 店名 / 代表者氏名 / 電話番号 / メールアドレス
+   └─ 「フォームの回答」タブ等    ← 別のGoogleフォームが連携。本GASは触らない
 ```
+
+## 書き込み先スプレッドシート
+
+`gas/Code.gs` 冒頭の定数で指定:
+
+```js
+const SPREADSHEET_ID = '14u979d9GilWEBkWx8vik2nzGQiNedK5tALuZkkAyEOQ';
+const SHEET_NAME = '組合員連絡先';
+```
+
+- **このGASはスタンドアロン**(スプレッドシートに bound されていない)。`getActiveSpreadsheet()` を使うと `null` を返すので、必ず `openById()` で明示的に開く。
+- 同じスプレッドシートには **別の Google フォームが連携した「フォームの回答」タブ等が存在する**。本GASは **`SHEET_NAME` で指定した「組合員連絡先」タブのみ** を読み書きするので、フォーム回答タブには影響しない。
+- 「組合員連絡先」タブは初回POST時に `insertSheet` で自動作成される(ヘッダー行も自動挿入)。
+- **書き込み先のスプレッドシートを変更したい場合** は `SPREADSHEET_ID` 定数を新しいIDに書き換えて `clasp push -f` → デプロイ更新の手順を踏む。
+
+### 権限要件 (重要)
+
+`appsscript.json` の `executeAs: USER_DEPLOYING` により、Web App は **デプロイした Google アカウント** の権限で実行される。
+
+- 上記 `SPREADSHEET_ID` のスプレッドシートに対して、**デプロイ者(組合アカウント)が「編集者」権限以上を保有している必要がある**。
+- 編集権限がない場合、`openById()` で `Exception: 権限がありません` 系のエラーが発生し、フォーム送信が常に「通信エラー」になる。
+- 別アカウントで再デプロイした場合は、そのアカウントにも編集権限を付与すること。
+- 初回デプロイ時または `openById` を新規追加した直後は、GAS の認可画面で **追加スコープ(外部スプレッドシートへのアクセス)** を承認するダイアログが出る場合がある。承認しないと実行されない。
 
 ## HEADERS 定義(契約)
 
@@ -68,8 +96,10 @@ git push origin master
 
 ```bash
 cd gas
-clasp push   # コードを GAS プロジェクトに反映
+clasp push -f   # コードを GAS プロジェクトに反映 (-f は対話確認スキップ)
 ```
+
+> **`-f` を付ける理由**: clasp v3.x はマニフェスト変更がある場合などに対話確認を求める仕様。非対話実行(CI や Claude Code 経由)で `-f` 無しだと `Skipping push.` と表示されて反映されない。手元から実行する場合も `-f` を付けておくと挙動が安定する。
 
 その後ブラウザで Apps Script を開き:
 
