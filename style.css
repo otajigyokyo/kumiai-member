@@ -82,8 +82,46 @@ body {
 .footer { text-align: center; margin-top: 40px; font-size: 0.78rem; color: var(--text-sub); }
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 .sp-only { display: none; }
+.email-suggest {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: #FFF4D6;
+  border: 1px solid #e6c869;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-top: 6px;
+  font-size: 0.85rem;
+}
+.email-suggest .suggest-text {
+  flex: 1 1 100%;
+  color: #6b5520;
+  line-height: 1.5;
+}
+.email-suggest button {
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid;
+  letter-spacing: 0.04em;
+}
+.email-suggest .suggest-btn-fix {
+  background: var(--green-mid);
+  color: #fff;
+  border-color: var(--green-mid);
+}
+.email-suggest .suggest-btn-fix:hover { opacity: 0.9; }
+.email-suggest .suggest-btn-keep {
+  background: #fff;
+  color: var(--text-sub);
+  border-color: #d0c5a0;
+}
+.email-suggest .suggest-btn-keep:hover { background: #f7f1de; }
 @media (max-width: 600px) {
   .container { padding: 24px 16px 40px; }
   .form-card { padding: 24px 18px 28px; }
   .sp-only { display: inline; }
+  .email-suggest button { flex: 1 1 calc(50% - 4px); min-width: 0; }
 }
