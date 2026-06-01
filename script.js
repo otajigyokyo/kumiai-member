@@ -113,7 +113,6 @@ function validate() {
     { id: 'baisan', errId: 'err-baisan', msg: '買参番号を入力してください', regex: /^[0-9]+$/, regexMsg: '半角数字で入力してください' },
     { id: 'shopname', errId: 'err-shopname', msg: '店名を入力してください' },
     { id: 'name', errId: 'err-name', msg: '代表者氏名を入力してください' },
-    { id: 'tel', errId: 'err-tel', msg: '電話番号を入力してください' },
   ];
   fields.forEach(f => {
     const el = document.getElementById(f.id);
@@ -123,6 +122,18 @@ function validate() {
     if (!val) { err.textContent = f.msg; el.classList.add('invalid'); ok = false; }
     else if (f.regex && !f.regex.test(val)) { err.textContent = f.regexMsg; el.classList.add('invalid'); ok = false; }
   });
+  const telShop = document.getElementById('tel_shop');
+  const telMobile = document.getElementById('tel_mobile');
+  const errTelShop = document.getElementById('err-tel_shop');
+  const errTelMobile = document.getElementById('err-tel_mobile');
+  [telShop, telMobile].forEach(el => { el.classList.remove('invalid'); });
+  [errTelShop, errTelMobile].forEach(el => { el.textContent = ''; });
+  if (!telShop.value.trim() && !telMobile.value.trim()) {
+    errTelMobile.textContent = '電話番号（店）または（携帯）を入力してください';
+    telShop.classList.add('invalid');
+    telMobile.classList.add('invalid');
+    ok = false;
+  }
   if (!validateEmailField(true)) ok = false;
   return ok;
 }
@@ -137,7 +148,8 @@ async function submitForm() {
     baisan: document.getElementById('baisan').value.trim(),
     shopname: document.getElementById('shopname').value.trim(),
     name: document.getElementById('name').value.trim(),
-    tel: document.getElementById('tel').value.trim(),
+    tel_shop: document.getElementById('tel_shop').value.trim(),
+    tel_mobile: document.getElementById('tel_mobile').value.trim(),
     email: document.getElementById('email').value.trim(),
   };
   try {
@@ -161,7 +173,7 @@ async function submitForm() {
 }
 
 function resetForm() {
-  ['baisan','shopname','name','tel','email'].forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).classList.remove('invalid'); });
+  ['baisan','shopname','name','tel_shop','tel_mobile','email'].forEach(id => { document.getElementById(id).value = ''; document.getElementById(id).classList.remove('invalid'); });
   document.querySelectorAll('.error').forEach(el => el.textContent = '');
   hideEmailSuggestion();
   document.getElementById('form-section').style.display = 'block';
