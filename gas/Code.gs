@@ -1,6 +1,6 @@
 const SPREADSHEET_ID = '14u979d9GilWEBkWx8vik2nzGQiNedK5tALuZkkAyEOQ';
 const SHEET_NAME = '組合員連絡先';
-const HEADERS = ['タイムスタンプ', '買参番号', '店名', '代表者氏名', '電話番号', 'メールアドレス'];
+const HEADERS = ['タイムスタンプ', '買参番号', '店名', '代表者氏名', '電話番号（店）', '電話番号（携帯）', 'メールアドレス'];
 const OFFICE_EMAIL = 'info@jigyokyo.com';
 const OFFICE_TEL = '03-5492-4065';
 const FORM_URL = 'https://member.jigyokyo.com/';
@@ -8,8 +8,8 @@ const FORM_URL = 'https://member.jigyokyo.com/';
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
-    const { baisan, shopname, name, tel, email } = data;
-    if (!baisan || !shopname || !name || !tel || !email) {
+    const { baisan, shopname, name, tel_shop, tel_mobile, email } = data;
+    if (!baisan || !shopname || !name || (!tel_shop && !tel_mobile) || !email) {
       return jsonResponse({ status: 'error', message: '必須項目が不足しています' });
     }
     const lock = LockService.getScriptLock();
@@ -26,9 +26,15 @@ function doPost(e) {
         sheet = ss.insertSheet(SHEET_NAME);
         sheet.appendRow(HEADERS);
         sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
+      } else if (sheet.getLastColumn() < HEADERS.length) {
+        // 旧フォーマット（6列）から新フォーマット（7列）へ移行:
+        // 電話番号（店）列の直後に電話番号（携帯）列を挿入し、ヘッダー行を上書き
+        sheet.insertColumnAfter(5);
+        sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+        sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
       }
       const now = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd HH:mm:ss');
-      const rowData = [now, baisan, shopname, name, tel, email];
+      const rowData = [now, baisan, shopname, name, tel_shop || '', tel_mobile || '', email];
       const lastRow = sheet.getLastRow();
       let updated = false;
       if (lastRow > 1) {
@@ -70,7 +76,8 @@ function sendConfirmationMail(data) {
     '  買参番号    : ' + data.baisan,
     '  店名       : ' + data.shopname,
     '  代表者氏名  : ' + data.name,
-    '  電話番号    : ' + maskTel(data.tel),
+    ...(data.tel_shop   ? ['  電話番号（店）  : ' + maskTel(data.tel_shop)]   : []),
+    ...(data.tel_mobile ? ['  電話番号（携帯）: ' + maskTel(data.tel_mobile)] : []),
     '  メールアドレス: ' + data.email,
     '',
     'ご登録内容に変更がある場合は、再度同じ買参番号で',
