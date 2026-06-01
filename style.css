@@ -26,30 +26,30 @@ body {
     radial-gradient(ellipse at 80% 100%, rgba(200,164,92,0.06) 0%, transparent 50%),
     var(--green-pale);
 }
-.container { max-width: 520px; margin: 0 auto; padding: 32px 20px 48px; }
+.container { max-width: 680px; margin: 0 auto; padding: 32px 20px 48px; }
 .header { text-align: center; margin-bottom: 24px; }
-.header-icon { font-size: 40px; margin-bottom: 8px; }
+.header-icon { font-size: 52px; margin-bottom: 8px; }
 .header h1 {
   font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 1.25rem; font-weight: 700;
+  font-size: 1.5rem; font-weight: 700;
   color: var(--green-deep); letter-spacing: 0.04em;
 }
 .subtitle { font-size: 0.95rem; color: var(--text-sub); margin-top: 4px; }
 .notice {
   background: var(--white); border-left: 4px solid var(--green-mid);
   border-radius: 8px; padding: 14px 18px; margin-bottom: 28px;
-  font-size: 0.88rem; color: var(--text-sub); box-shadow: var(--shadow);
+  font-size: 0.93rem; color: var(--text-sub); box-shadow: var(--shadow);
 }
 .form-card {
   background: var(--white); border-radius: var(--radius);
-  padding: 28px 24px 32px; box-shadow: var(--shadow);
+  padding: 36px 32px 40px; box-shadow: var(--shadow);
 }
 .field { margin-bottom: 20px; }
-.field label { display: block; font-size: 0.88rem; font-weight: 500; margin-bottom: 6px; color: var(--green-deep); }
+.field label { display: block; font-size: 0.95rem; font-weight: 500; margin-bottom: 6px; color: var(--green-deep); }
 .req { font-size: 0.7rem; background: var(--error); color: #fff; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
 .field input {
-  width: 100%; padding: 12px 14px; border: 1.5px solid #d0ddd4;
-  border-radius: 8px; font-size: 1rem; font-family: inherit;
+  width: 100%; padding: 14px 16px; border: 1.5px solid #d0ddd4;
+  border-radius: 8px; font-size: 1.05rem; font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s; background: var(--green-pale);
 }
 .field input:focus { outline: none; border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(58,122,82,0.12); }
@@ -122,7 +122,10 @@ body {
 .email-suggest .suggest-btn-keep:hover { background: #f7f1de; }
 @media (max-width: 600px) {
   .container { padding: 24px 16px 40px; }
-  .form-card { padding: 24px 18px 28px; }
+  .form-card { padding: 24px 18px 28px; border-radius: 8px; }
+  .field { margin-bottom: 24px; }
+  .field input { font-size: 16px; }
+  #submit-btn { padding: 16px; }
   .sp-only { display: inline; }
   .email-suggest button { flex: 1 1 calc(50% - 4px); min-width: 0; }
 }
