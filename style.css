@@ -120,6 +120,16 @@ body {
   border-color: #d0c5a0;
 }
 .email-suggest .suggest-btn-keep:hover { background: #f7f1de; }
+@media (min-width: 769px) {
+  .container { max-width: 960px; padding: 20px 40px 32px; }
+  .form-card { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; padding: 24px 32px 28px; }
+  .form-card .field { margin-bottom: 0; }
+  .form-card #submit-btn { grid-column: 1 / -1; }
+  .field input { padding: 10px 12px; font-size: 0.95rem; }
+  .field label { font-size: 0.88rem; }
+  .header-icon { font-size: 36px; }
+  .notice { margin-bottom: 14px; padding: 10px 16px; }
+}
 @media (max-width: 600px) {
   .container { padding: 24px 16px 40px; }
   .form-card { padding: 24px 18px 28px; border-radius: 8px; }
