@@ -22,16 +22,20 @@ function doPost(e) {
     try {
       const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
       let sheet = ss.getSheetByName(SHEET_NAME);
+      const telShopCol = HEADERS.indexOf('電話番号（店）') + 1;
+      const telMobileCol = HEADERS.indexOf('電話番号（携帯）') + 1;
       if (!sheet) {
         sheet = ss.insertSheet(SHEET_NAME);
         sheet.appendRow(HEADERS);
         sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
+        setTelColumnFormat_(sheet, telShopCol, telMobileCol);
       } else if (sheet.getLastColumn() < HEADERS.length) {
         // 旧フォーマット（6列）から新フォーマット（7列）へ移行:
         // 電話番号（店）列の直後に電話番号（携帯）列を挿入し、ヘッダー行を上書き
         sheet.insertColumnAfter(5);
         sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
         sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
+        setTelColumnFormat_(sheet, telShopCol, telMobileCol);
       }
       const now = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd HH:mm:ss');
       const rowData = [now, baisan, shopname, name, tel_shop || '', tel_mobile || '', email];
@@ -41,12 +45,20 @@ function doPost(e) {
         const baisanCol = sheet.getRange(2, 2, lastRow - 1, 1).getValues();
         for (let i = 0; i < baisanCol.length; i++) {
           if (String(baisanCol[i][0]) === String(baisan)) {
-            sheet.getRange(i + 2, 1, 1, HEADERS.length).setValues([rowData]);
+            const targetRow = i + 2;
+            sheet.getRange(targetRow, telShopCol).setNumberFormat('@STRING@');
+            sheet.getRange(targetRow, telMobileCol).setNumberFormat('@STRING@');
+            sheet.getRange(targetRow, 1, 1, HEADERS.length).setValues([rowData]);
             updated = true; break;
           }
         }
       }
-      if (!updated) sheet.appendRow(rowData);
+      if (!updated) {
+        sheet.appendRow(rowData);
+        const newLastRow = sheet.getLastRow();
+        sheet.getRange(2, telShopCol, newLastRow - 1, 1).setNumberFormat('@STRING@');
+        sheet.getRange(2, telMobileCol, newLastRow - 1, 1).setNumberFormat('@STRING@');
+      }
       result = { status: 'ok', action: updated ? 'updated' : 'created' };
     } finally {
       lock.releaseLock();
@@ -54,6 +66,13 @@ function doPost(e) {
     sendConfirmationMail(data);
     return jsonResponse(result);
   } catch (err) { return jsonResponse({ status: 'error', message: err.message }); }
+}
+
+function setTelColumnFormat_(sheet, telShopCol, telMobileCol) {
+  const maxRows = sheet.getMaxRows();
+  if (maxRows < 2) return;
+  sheet.getRange(2, telShopCol, maxRows - 1, 1).setNumberFormat('@STRING@');
+  sheet.getRange(2, telMobileCol, maxRows - 1, 1).setNumberFormat('@STRING@');
 }
 
 function maskTel(tel) {
