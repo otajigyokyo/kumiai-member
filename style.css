@@ -55,6 +55,7 @@ body {
 .field input:focus { outline: none; border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(58,122,82,0.12); }
 .field input.invalid { border-color: var(--error); }
 .error { display: block; font-size: 0.78rem; color: var(--error); min-height: 1.2em; margin-top: 4px; }
+.field-note { font-size: 0.78rem; color: #666; margin: 4px 0 2px; }
 #submit-btn {
   display: block; width: 100%; padding: 14px; margin-top: 8px;
   background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
