@@ -328,7 +328,12 @@ H: 出欠(別フォームの可能性、本GASでは無視)
 - `gas-admin` 向けの `clasp create` / `clasp push` は **必ず `gas-admin/` ディレクトリ内で実行する**。
 - リポジトリ直下や `gas/` から `gas-admin` 用のコマンドを実行しない。誤って別プロジェクトの `.clasp.json` を上書き・混用する事故を防ぐため。
 - 逆に `gas/` 向けの操作を `gas-admin/` から行うことも禁止。
-- **`clasp push` など clasp 作業の前に、必ず `clasp show-authorized-user` でログイン中のGoogleアカウントを確認する習慣をつける。** `gas/` と `gas-admin/` は別スクリプトIDに紐づいており、意図しない/別アカウントでログインしたまま push すると、想定と異なるGASプロジェクトに反映されたり、権限エラーに気づかず放置される事故につながる。`clasp login` でアカウントを切り替えた直後や、しばらく間隔を空けて作業を再開したときは特に確認すること。
+- **`clasp push` など clasp 作業の前に、必ず `clasp show-authorized-user` でログイン中のGoogleアカウントが `otajigyokyo@gmail.com` であることを確認する習慣をつける。** `gas/` と `gas-admin/` は別スクリプトIDに紐づいており、意図しない/別アカウントでログインしたまま push すると、想定と異なるGASプロジェクトに反映されたり、権限エラーに気づかず放置される事故につながる。`clasp login` でアカウントを切り替えた直後や、しばらく間隔を空けて作業を再開したときは特に確認すること。
+
+### git push の運用ルール(重要)
+
+- このリポジトリへの `git push` は **`otajigyokyo` アカウント** を使用する(ローカル環境では `git config credential.username otajigyokyo` を設定済み)。別アカウント(例: `TOKYOFLOWER`)の資格情報で push しようとすると `403 Permission denied` になる。
+- **push失敗・認証エラーなど認証系のエラーが発生した場合、資格情報の切り替えなどを勝手にリトライしない。** 一度ユーザーに状況を報告し、対応方針を確認してから進めること(認証設定の変更は影響範囲が広く、誤ったアカウントでの操作は事故につながるため)。
 
 ### 初回セットアップ手順
 
