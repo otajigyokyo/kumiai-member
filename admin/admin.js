@@ -1,4 +1,4 @@
-const GAS_URL = 'https://script.google.com/macros/s/XXXXXXXX/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxvMs5vBKLuk4_ofiAhyE_NOhvmguLszng4v9RI1oggJfbItElrIhHoppD9nyE0UeY9/exec';
 const USE_MOCK = false;
 
 let currentRecipientCount = 0;
