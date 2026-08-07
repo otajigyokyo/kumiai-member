@@ -1,6 +1,5 @@
-const GAS_URL = 'https://script.google.com/macros/s/REPLACE_WITH_GAS_ADMIN_DEPLOY_ID/exec';
-// TODO: gas-admin をデプロイしたら上記URLを実際のデプロイURLに置き換え、USE_MOCK を false にすること。
-const USE_MOCK = true;
+const GAS_URL = 'https://script.google.com/macros/s/XXXXXXXX/exec';
+const USE_MOCK = false;
 
 let currentRecipientCount = 0;
 let sendAllInProgress = false;
