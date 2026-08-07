@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>組合員メール配信 管理画面 | 大田市場花き事業協同組合</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="page-bg"></div>
+  <main class="container">
+    <header class="header">
+      <div class="header-icon">📨</div>
+      <h1>組合員メール配信</h1>
+      <p class="subtitle">管理画面（スタッフ専用）</p>
+    </header>
+
+    <section id="login-section">
+      <div class="card">
+        <div id="login-step-email">
+          <div class="field">
+            <label for="login-email">メールアドレス</label>
+            <input type="email" id="login-email" placeholder="スタッフの登録メールアドレス" autocomplete="email">
+            <span class="error" id="err-login-email"></span>
+          </div>
+          <button id="btn-request-otp" class="btn-primary" onclick="requestOtp(false)">
+            <span class="btn-text">認証コードを送信</span>
+            <span class="btn-loading" style="display:none;">送信中...</span>
+          </button>
+        </div>
+        <div id="login-step-otp" style="display:none;">
+          <p class="hint">認証コードを送信しました。メールをご確認ください。</p>
+          <div class="field">
+            <label for="login-otp">認証コード（6桁）</label>
+            <input type="text" id="login-otp" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="123456">
+            <span class="error" id="err-login-otp"></span>
+          </div>
+          <button id="btn-verify-otp" class="btn-primary" onclick="verifyOtp()">
+            <span class="btn-text">ログイン</span>
+            <span class="btn-loading" style="display:none;">確認中...</span>
+          </button>
+          <div class="link-row">
+            <button type="button" class="btn-link" onclick="backToEmailStep()">メールアドレスを変更する</button>
+            <button type="button" class="btn-link" onclick="requestOtp(true)">認証コードを再送する</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin-section" style="display:none;">
+      <div class="admin-topbar">
+        <span id="login-email-display"></span>
+        <button type="button" class="btn-link" onclick="logout()">ログアウト</button>
+      </div>
+
+      <div class="card">
+        <h2>配信内容</h2>
+        <div class="field">
+          <label for="compose-subject">件名</label>
+          <input type="text" id="compose-subject" placeholder="例: 【組合からのお知らせ】〇〇について">
+        </div>
+        <div class="field">
+          <div class="field-toolbar">
+            <label for="compose-body">本文</label>
+            <button type="button" class="btn-insert" onclick="insertPlaceholder()">{{店名}}を挿入</button>
+          </div>
+          <textarea id="compose-body" rows="10" placeholder="本文を入力してください"></textarea>
+          <p class="field-note">{{買参番号}} も宛先ごとに置き換わります。末尾に事務局の連絡先が自動で追加されます。</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>配信先</h2>
+        <p id="recipient-count">配信先: 読み込み中...</p>
+        <button type="button" class="btn-link" onclick="toggleRecipientList()" id="btn-toggle-recipients">一覧を表示</button>
+        <div id="recipient-list-wrap" style="display:none;">
+          <div class="recipient-list" id="recipient-list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>送信</h2>
+        <button id="btn-send-test" class="btn-secondary" onclick="sendTest()">
+          <span class="btn-text">自分にテスト送信</span>
+          <span class="btn-loading" style="display:none;">送信中...</span>
+        </button>
+        <button id="btn-send-all" class="btn-primary" onclick="requestSendAllConfirm()">一斉送信する</button>
+
+        <div id="send-confirm" class="confirm-box" style="display:none;">
+          <p id="send-confirm-text"></p>
+          <div class="confirm-actions">
+            <button type="button" class="btn-danger" onclick="doSendAll()">送信を実行する</button>
+            <button type="button" class="btn-secondary" onclick="cancelSendAllConfirm()">キャンセル</button>
+          </div>
+        </div>
+
+        <p id="send-progress" style="display:none;">処理中です。しばらくお待ちください...</p>
+        <div id="send-result" class="result-box" style="display:none;"></div>
+      </div>
+
+      <div class="card">
+        <h2>配信履歴（直近20件）</h2>
+        <div id="history-wrap">読み込み中...</div>
+      </div>
+
+      <div class="card">
+        <details>
+          <summary>使い方（スタッフ向け）</summary>
+          <ol class="usage-list">
+            <li>登録メールアドレスを入力し「認証コードを送信」を押す</li>
+            <li>届いたメールの6桁コードを入力し「ログイン」を押す</li>
+            <li>件名と本文を入力する（{{店名}} {{買参番号}} は宛先ごとに自動で差し替わる）</li>
+            <li>「自分にテスト送信」で内容を確認する</li>
+            <li>問題なければ「一斉送信する」→確認画面で件数を確認して実行する</li>
+            <li>結果が表示されるまでこの画面を閉じない</li>
+            <li>送信可能件数の上限で中断した場合は「残りを送信する」で再開できる（二重送信の心配はない）</li>
+          </ol>
+        </details>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>&copy; 大田市場花き事業協同組合</p>
+    </footer>
+  </main>
+  <script src="admin.js"></script>
+</body>
+</html>
