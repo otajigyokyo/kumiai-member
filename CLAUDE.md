@@ -24,6 +24,9 @@
 | `README.md` | セットアップ手順(初期構築用) |
 | `.gitignore` | `gas/.clasp.json` 等を除外 |
 | `001.txt` | **初回構築時の作業指示書**(現在は履歴的価値のみ。Section「001.txt について」参照) |
+| `admin/` | 組合員向けメール一斉送信の **スタッフ用管理画面**(フロント)。Section「管理画面(gas-admin / admin)」参照 |
+| `gas-admin/Code.gs` | 管理画面用GAS Web App 本体(登録用の `gas/Code.gs` とは別の独立プロジェクト) |
+| `gas-admin/appsscript.json` | 管理画面用GASマニフェスト |
 
 ## データフロー
 
@@ -301,3 +304,101 @@ H: 出欠(別フォームの可能性、本GASでは無視)
 5. 本番フォーム(`member.jigyokyo.com`)から自分宛のメアドで1件登録
 6. 完了メールが届くこと、電話番号が下4桁のみ表示されていること確認
 7. テストデータをスプレッドシートから削除
+
+## 管理画面(gas-admin / admin)(2026/08/07追加)
+
+組合員向けメール一斉送信を行う **スタッフ専用のWeb管理画面**。組合員登録フォーム(`index.html` / `script.js` / `gas/`)とは完全に独立しており、既存ファイルには一切手を加えていない。
+
+### 構成
+
+| パス | 役割 |
+|---|---|
+| `admin/index.html` | 管理画面本体(ログイン画面 + 配信画面) |
+| `admin/admin.css` | スタイル(登録フォームとデザイントーンを統一、モバイルファースト) |
+| `admin/admin.js` | クライアントロジック。冒頭の `GAS_URL` が管理API用GASのデプロイ先、`USE_MOCK` でモック動作切り替え |
+| `gas-admin/Code.gs` | 管理API本体(`doPost` 一本、`action` フィールドで分岐) |
+| `gas-admin/appsscript.json` | 管理API用GASマニフェスト(`ANYONE_ANONYMOUS` / `USER_DEPLOYING`、登録用と同一パターン) |
+
+公開URLは `https://member.jigyokyo.com/admin/`(登録フォームと同じ GitHub Pages リポジトリのサブディレクトリ)。
+
+### ⚠️ clasp の運用ルール(重要)
+
+`gas/`(登録用Web App)と `gas-admin/`(管理API)は **別々の独立したスタンドアロンGASプロジェクト** であり、それぞれ専用の `.clasp.json` を持つ(いずれも `.gitignore` 対象)。
+
+- `gas-admin` 向けの `clasp create` / `clasp push` は **必ず `gas-admin/` ディレクトリ内で実行する**。
+- リポジトリ直下や `gas/` から `gas-admin` 用のコマンドを実行しない。誤って別プロジェクトの `.clasp.json` を上書き・混用する事故を防ぐため。
+- 逆に `gas/` 向けの操作を `gas-admin/` から行うことも禁止。
+
+### 初回セットアップ手順
+
+1. **`gas-admin` プロジェクトを作成**(ユーザーがPowerShellで実行。上記ルールの通り `gas-admin/` ディレクトリ内で実行すること):
+
+   ```powershell
+   cd gas-admin
+   clasp create --title "組合員メール配信API" --type standalone --rootDir ./
+   cd ..
+   ```
+
+   これにより `gas-admin/.clasp.json` が生成される。`clasp create` が独自の `appsscript.json` を生成して上書きする場合は、リポジトリの `gas-admin/appsscript.json` の内容(`ANYONE_ANONYMOUS` / `USER_DEPLOYING`)に戻してから次のステップに進む。
+
+2. **コードを反映**:
+
+   ```powershell
+   cd gas-admin
+   clasp push -f
+   cd ..
+   ```
+
+3. **スクリプトプロパティに `ADMIN_EMAILS` を設定**(ブラウザ上のApps Scriptエディタで実施):
+   - 左メニュー「プロジェクトの設定」→「スクリプト プロパティ」→「スクリプト プロパティを追加」
+   - プロパティ: `ADMIN_EMAILS`
+   - 値: ログインを許可するスタッフの個人アドレスをカンマ区切りで指定(例: `staff1@example.com,staff2@example.com`)
+   - 照合時に小文字化・trimされるので大文字/前後の空白は気にしなくてよい
+
+4. **Web Appとしてデプロイ**(ブラウザで実施):
+   - 右上「デプロイ」→「新しいデプロイ」
+   - 種類: ウェブアプリ
+   - 実行ユーザー: **自分**
+   - アクセスできるユーザー: **全員**
+   - デプロイ後に発行される `.../exec` URLを控える
+
+5. **初回認可**: Apps Scriptエディタで `doGet` を実行し、認可ダイアログを承認する(`MailApp` / `SpreadsheetApp` 等のスコープ)。
+
+6. **フロントに反映**: `admin/admin.js` 冒頭の `GAS_URL` を手順4で控えたURLに書き換え、`USE_MOCK` を `false` に変更してコミット・push。
+
+### 以後のデプロイ更新手順
+
+登録用GAS(`gas/`)と同様、**既存デプロイの「バージョン更新」** を使う(新しいデプロイは選ばない。URLが変わり `admin.js` の書き換えが必要になるため)。
+
+```powershell
+cd gas-admin
+clasp push -f
+cd ..
+```
+
+その後ブラウザで Apps Script を開き、「デプロイ」→「デプロイを管理」→ 既存デプロイの鉛筆マーク → バージョンを「新しいバージョン」に切り替え → 「デプロイ」。
+
+### 認証設計
+
+- ホワイトリスト(`ADMIN_EMAILS`)照合によるメールOTP(6桁数字、有効期限10分、5回失敗で失効、同一アドレス60秒間隔で再送制限)。
+- 照合結果(ホワイトリストに存在するか否か)はレスポンス文言で秘匿する(`request_otp` は成功可否に関わらず同一レスポンス)。
+- 認証成功でセッショントークン(`Utilities.getUuid()` を2つ連結)を発行、`CacheService` に6時間TTLで保存。
+- `request_otp` / `verify_otp` 以外の全 `action` は `doPost` 冒頭でトークンからメールアドレスを解決し、解決できなければ `{status:'error', code:'auth_error'}` を返す。トークンは常にPOSTボディで受け取り、URLパラメータでは受け取らない。
+- フロントは `code === 'auth_error'` を検知したらセッションを破棄してログイン画面へ戻す(`admin.js` の `call()`)。
+
+### 一斉送信のスキップ/再送ロジック
+
+- 送信対象は「統合ビュー」A2:C(買参番号/店名/メール)。形式不正・メールアドレス重複(先勝ち)は送信対象から除外し、`配信ログ`に `スキップ: 形式不正` / `スキップ: 重複` として記録する。
+- 一斉送信ごとに配信ID(`deliveryId`)を発行(クライアント側で生成し `sessionStorage` に保持)。同一配信IDで再実行した場合、**既に成功送信済みのアドレスは再送しない**(`配信ログ`の該当配信ID行を参照して判定)。失敗した宛先は次回同一配信IDでの実行時に再送対象になる。
+- `MailApp.getRemainingDailyQuota()` を送信前に確認し、日次上限(無料枠1日100通)に達したら残りを送信せず打ち切り、フロントに「残りを送信する」ボタンを表示して同一配信IDで再開できるようにする。
+- `LockService.getScriptLock().tryLock(5000)` で一斉送信の二重起動を防止(登録用GASの `waitLock` とは異なり、取得できなければ即エラーを返す設計)。
+
+### スタッフ向けログイン手順(概要)
+
+1. `https://member.jigyokyo.com/admin/` を開く
+2. 登録されている自分のメールアドレスを入力し「認証コードを送信」
+3. 届いたメールの6桁コードを入力し「ログイン」
+4. 件名・本文を入力(`{{店名}}` `{{買参番号}}` は宛先ごとに自動置換される)
+5. 「自分にテスト送信」で内容を確認してから「一斉送信する」
+
+管理画面内にも同内容の操作説明を折りたたみ(`<details>`)で用意している。
